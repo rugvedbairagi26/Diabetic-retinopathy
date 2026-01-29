@@ -1,222 +1,223 @@
-# Diabetic-retinopathy
+🩺 Diabetic Retinopathy Severity Classification using Deep Learning
 
-🩺 Diabetic Retinopathy Severity Classification using CNNs
-📌 Project Motivation
+This project focuses on automatic classification of diabetic retinopathy (DR) severity levels from retinal fundus images using convolutional neural networks and transfer learning. The goal is to build a reliable multi-class classifier that can support early screening and grading of diabetic retinopathy.
 
-Diabetic Retinopathy (DR) is a common complication of diabetes and can lead to permanent vision loss if not detected in time. Manual screening of retinal images is time-consuming and requires trained ophthalmologists, so automated screening using deep learning can be useful as a support tool.
+🎯 Problem Statement
 
-In this project, I worked on multi-class classification of diabetic retinopathy severity using retinal fundus images and transfer learning with convolutional neural networks. The goal was not only to train a model, but also to follow a proper ML workflow similar to research projects.
+Diabetic Retinopathy is a diabetes-related eye disease that damages retinal blood vessels and can lead to blindness if not detected early. Manual grading of retinal images is time-consuming and requires trained ophthalmologists.
+
+This project aims to:
+
+classify retinal fundus images into 5 severity levels
+
+evaluate performance on imbalanced clinical data
+
+analyze model behavior across minority disease classes
 
 📊 Dataset
 
 Dataset: APTOS 2019 Blindness Detection (Kaggle)
 
-Each image is labeled into one of five classes:
+Images: ~3,600 labeled retinal fundus images
 
-0 → No DR
+Classes:
 
-1 → Mild
+0 – No DR
 
-2 → Moderate
+1 – Mild
 
-3 → Severe
+2 – Moderate
 
-4 → Proliferative DR
+3 – Severe
 
-Observations from the Dataset
+4 – Proliferative DR
 
-The dataset is highly imbalanced, with very few images in Severe and Proliferative classes.
+Challenges
 
-Images vary a lot in:
+Strong class imbalance, especially in Severe and Proliferative classes
 
-brightness
-
-sharpness
-
-background noise
-
-Resolution also varies, so resizing strategy becomes important.
-
-Because of these factors, classification is not trivial even for deep models.
+Large variations in brightness, contrast, and image quality
 
 🔍 Exploratory Data Analysis
 
-Before training, I performed basic EDA:
+Before training, I analyzed:
 
-Checked class distribution → confirmed strong imbalance.
+✔ Class Distribution
 
-Visualized random samples from each class to understand lesion patterns.
+The dataset is highly imbalanced, with far fewer samples in advanced disease categories.
 
-Verified that image paths are correct and readable.
+✔ Visual Inspection
 
-This step helped in understanding why simple accuracy alone is not enough to evaluate medical models.
+Random samples from each class were visualized to inspect:
 
-✂️ Data Splitting Strategy
+lesion patterns
 
-To avoid biased evaluation, I used stratified splitting:
+illumination differences
 
-Train: 70%
+background artifacts
 
-Validation: 15%
+This analysis motivated careful preprocessing and conservative augmentation.
 
-Test: 15%
+🔀 Dataset Splitting Strategy
 
-Stratification was done using class labels so that each split has similar class distribution.
+To ensure fair evaluation:
 
-The splits were saved as CSV files to ensure reproducibility.
+Training set: 70%
 
-⚙️ Data Pipeline Optimization
+Validation set: 15%
 
-Initially, loading images directly from Google Drive caused very slow training due to I/O bottlenecks.
-To fix this:
+Test set: 15%
 
-All images were copied to Colab local storage (/content/train_images)
+✔ Stratified Splitting
 
-Image paths in CSV files were updated accordingly
+Splits were created using stratified sampling so that each subset preserves original class proportions.
+This avoids biased evaluation on rare classes.
 
-This significantly improved training speed and GPU utilization.
+All splits were saved as CSV files for reproducibility.
 
-🧠 Models Used
+⚙️ Preprocessing and Data Loading
 
-I trained two different CNN architectures using transfer learning:
+Image resizing to 224 × 224
 
+Model-specific normalization:
+
+ResNet preprocessing for ResNet model
+
+EfficientNet preprocessing for EfficientNet model
+
+Horizontal flipping for augmentation
+
+To improve I/O speed, images were copied from Google Drive to local Colab storage before training.
+
+🧠 Models and Training
 🔹 Baseline Model — ResNet50
 
 Pretrained on ImageNet
 
-Backbone kept frozen
+Backbone frozen
 
-Custom classifier added:
+Custom classifier head:
 
 Global Average Pooling
 
-Dense layer (256 units)
+Dense (256)
 
 Dropout (0.5)
 
-Softmax output for 5 classes
+Softmax (5 classes)
 
-Training:
-
-Optimizer: Adam (lr = 1e-3)
-
-Loss: Sparse categorical cross-entropy
-
-Epochs: 8
-
-This model acts as a baseline for comparison.
+Purpose: evaluate how generic visual features perform on retinal images.
 
 🔹 Improved Model — EfficientNetB0
 
-EfficientNet was selected because it provides better performance with fewer parameters.
+EfficientNet was chosen due to:
 
-Phase 1 — Feature Extraction
+better parameter efficiency
+
+stronger feature extraction
+
+Stage 1: Feature Extraction
 
 Backbone frozen
 
 Only classifier trained
 
-Epochs: 8
+Stage 2: Fine-Tuning
 
-Learning rate: 1e-3
+Upper convolution layers unfrozen
 
-Phase 2 — Fine-Tuning
+Lower layers kept frozen
 
-Upper layers of backbone unfrozen
+Reduced learning rate
 
-Lower layers kept frozen to avoid overfitting
+This allows adaptation to retinal lesion patterns while preserving general visual features.
 
-Learning rate reduced to 1e-4
+📈 Evaluation Results
+🔹 Baseline (ResNet50)
 
-Epochs: 15
+Accuracy: ~78%
 
-Fine-tuning helped the model adapt pretrained features to retinal lesion patterns.
+Very low recall for:
 
-📈 Evaluation Metrics
+Severe DR
 
-Models were evaluated on the held-out test set using:
+Proliferative DR
 
-Accuracy
+This indicates strong bias toward majority classes due to imbalance.
 
-Precision, Recall, F1-score (per class)
+🔹 Improved Model (EfficientNetB0 + Fine-Tuning)
 
-Confusion Matrix
+Accuracy: ~83%
 
-🔹 ResNet50 Results
+Improved recall for minority classes
 
-Good performance on majority classes (No DR, Moderate)
+Better macro-averaged F1 score
 
-Very low recall for Severe and Proliferative classes
+Remaining confusion mainly occurs between:
 
-This shows the effect of class imbalance and why accuracy alone is misleading.
+Moderate vs Severe DR
 
-🔹 EfficientNet Results
+Severe vs Proliferative DR
 
-Higher overall accuracy
+These categories also show overlap in clinical grading.
 
-Better recall for minority classes compared to ResNet
+🧠 Analysis and Limitations
 
-More balanced macro-averaged F1 score
+Severe class imbalance still limits recall for advanced disease stages
 
-This confirms that both architecture choice and fine-tuning improve medical image classification performance.
+Borderline clinical cases are difficult even for human experts
 
-🔍 Error Analysis
+Model trained on single dataset — generalization to other hospitals not guaranteed
 
-Wrong predictions were visualized manually to understand failure cases.
+These limitations motivate further research into:
 
-Common error patterns:
+class-balanced loss functions
 
-Confusion between Moderate and Severe DR
+multi-dataset training
 
-Confusion between Severe and Proliferative DR
+lesion-aware attention mechanisms
 
-Low contrast images where lesions are not clearly visible
+💾 Model Saving
 
-This highlights that even strong CNNs struggle with subtle medical differences and that interpretability is important.
+Trained models are saved for:
 
-💾 Saved Models
+inference experiments
 
-Final trained models were saved for future experiments:
+Grad-CAM visualization
 
-resnet50_baseline.h5
+further fine-tuning
 
-efficientnet_final.h5
-
-🔬 What I Learned from This Project
-
-How to properly handle class imbalance in medical datasets
-
-Why stratified splitting is important
-
-Difference between feature extraction and fine-tuning
-
-Importance of class-wise metrics instead of only accuracy
-
-Practical issues like data loading bottlenecks in Colab
-
-This project helped me understand how real ML pipelines are built beyond just fitting a model.
+Both baseline and final models are stored for future comparison.
 
 🚀 Future Work
 
-The following improvements are planned:
+Planned extensions:
 
-🔹 Grad-CAM Visualization
+✔ Explainability
 
-I plan to apply Grad-CAM to visualize where the CNN focuses in retinal images, to check if predictions are based on lesion areas instead of background artifacts. This is important for explainable medical AI.
+Grad-CAM to verify that predictions focus on lesion regions instead of background artifacts
 
-🔹 Imbalance Handling
+✔ Class Imbalance Handling
 
-Future experiments will include:
+Focal loss
 
-class-weighted loss
+Class-weighted loss functions
 
-focal loss
+✔ Generalization
 
-to improve detection of severe DR stages.
+Evaluation on external datasets (IDRiD, Messidor)
 
-🔹 Higher Resolution Training
+✔ Clinical Relevance
 
-Since retinal lesions are small, future work will try training with higher resolution inputs or patch-based approaches.
+Binary DR screening → severity grading pipeline
+
+🧪 Environment
+
+TensorFlow / Keras
+
+Training performed using Kaggle / Colab GPU environment
+
+Image loading via Keras ImageDataGenerator
 
 🛠 Tools and Libraries
 
