@@ -8,11 +8,11 @@ Diabetic Retinopathy is a diabetes-related eye disease that damages retinal bloo
 
 This project aims to:
 
-classify retinal fundus images into 5 severity levels
+1)classify retinal fundus images into 5 severity levels
 
-evaluate performance on imbalanced clinical data
+2)evaluate performance on imbalanced clinical data
 
-analyze model behavior across minority disease classes
+3)analyze model behavior across minority disease classes
 
 📊 Dataset
 
@@ -34,9 +34,9 @@ Classes:
 
 Challenges
 
-Strong class imbalance, especially in Severe and Proliferative classes
+1)Strong class imbalance, especially in Severe and Proliferative classes
 
-Large variations in brightness, contrast, and image quality
+2)Large variations in brightness, contrast, and image quality
 
 🔍 Exploratory Data Analysis
 
@@ -50,11 +50,11 @@ The dataset is highly imbalanced, with far fewer samples in advanced disease cat
 
 Random samples from each class were visualized to inspect:
 
-lesion patterns
+1)lesion patterns
 
-illumination differences
+2)illumination differences
 
-background artifacts
+3)background artifacts
 
 This analysis motivated careful preprocessing and conservative augmentation.
 
@@ -77,34 +77,34 @@ All splits were saved as CSV files for reproducibility.
 
 ⚙️ Preprocessing and Data Loading
 
-Image resizing to 224 × 224
+1)Image resizing to 224 × 224
 
-Model-specific normalization:
+2)Model-specific normalization:
 
-ResNet preprocessing for ResNet model
+3)ResNet preprocessing for ResNet model
 
-EfficientNet preprocessing for EfficientNet model
+4)EfficientNet preprocessing for EfficientNet model
 
-Horizontal flipping for augmentation
+5)Horizontal flipping for augmentation
 
-To improve I/O speed, images were copied from Google Drive to local Colab storage before training.
+6)To improve I/O speed, images were copied from Google Drive to local Colab storage before training.
 
 🧠 Models and Training
 🔹 Baseline Model — ResNet50
 
-Pretrained on ImageNet
+1)Pretrained on ImageNet
 
-Backbone frozen
+2)Backbone frozen
 
-Custom classifier head:
+3)Custom classifier head:
 
-Global Average Pooling
+4)Global Average Pooling
 
-Dense (256)
+5)Dense (256)
 
-Dropout (0.5)
+6)Dropout (0.5)
 
-Softmax (5 classes)
+7)Softmax (5 classes)
 
 Purpose: evaluate how generic visual features perform on retinal images.
 
@@ -118,72 +118,72 @@ stronger feature extraction
 
 Stage 1: Feature Extraction
 
-Backbone frozen
+1)Backbone frozen
 
-Only classifier trained
+2)Only classifier trained
 
 Stage 2: Fine-Tuning
 
-Upper convolution layers unfrozen
+1)Upper convolution layers unfrozen
 
-Lower layers kept frozen
+2)Lower layers kept frozen
 
-Reduced learning rate
+3)Reduced learning rate
 
 This allows adaptation to retinal lesion patterns while preserving general visual features.
 
 📈 Evaluation Results
 🔹 Baseline (ResNet50)
 
-Accuracy: ~78%
+1)Accuracy: ~78%
 
-Very low recall for:
+2)Very low recall for:
 
-Severe DR
+3)Severe DR
 
-Proliferative DR
+4)Proliferative DR
 
 This indicates strong bias toward majority classes due to imbalance.
 
 🔹 Improved Model (EfficientNetB0 + Fine-Tuning)
 
-Accuracy: ~83%
+1)Accuracy: ~83%
 
-Improved recall for minority classes
+2)Improved recall for minority classes
 
-Better macro-averaged F1 score
+3)Better macro-averaged F1 score
 
 Remaining confusion mainly occurs between:
 
-Moderate vs Severe DR
+1)Moderate vs Severe DR
 
-Severe vs Proliferative DR
+2)Severe vs Proliferative DR
 
 These categories also show overlap in clinical grading.
 
 🧠 Analysis and Limitations
 
-Severe class imbalance still limits recall for advanced disease stages
+1)Severe class imbalance still limits recall for advanced disease stages
 
-Borderline clinical cases are difficult even for human experts
+2)Borderline clinical cases are difficult even for human experts
 
-Model trained on single dataset — generalization to other hospitals not guaranteed
+3)Model trained on single dataset — generalization to other hospitals not guaranteed
 
 These limitations motivate further research into:
 
-class-balanced loss functions
+1)class-balanced loss functions
 
-multi-dataset training
+2)multi-dataset training
 
-lesion-aware attention mechanisms
+3)lesion-aware attention mechanisms
 
 💾 Model Saving
 
-Trained models are saved for:
+1)Trained models are saved for:
 
-inference experiments
+2)inference experiments
 
-Grad-CAM visualization
+3)Grad-CAM visualization
 
 further fine-tuning
 
@@ -195,21 +195,21 @@ Planned extensions:
 
 ✔ Explainability
 
-Grad-CAM to verify that predictions focus on lesion regions instead of background artifacts
+1)Grad-CAM to verify that predictions focus on lesion regions instead of background artifacts
 
 ✔ Class Imbalance Handling
 
 Focal loss
 
-Class-weighted loss functions
+2)Class-weighted loss functions
 
 ✔ Generalization
 
-Evaluation on external datasets (IDRiD, Messidor)
+3)Evaluation on external datasets (IDRiD, Messidor)
 
 ✔ Clinical Relevance
 
-Binary DR screening → severity grading pipeline
+4)Binary DR screening → severity grading pipeline
 
 🧪 Environment
 
